@@ -1,21 +1,40 @@
 import express from "express";
 import data from "./data.js";
-const app = express();
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import seedRouter from "./Routes/seedRoute.js";
+import productRouter from "./Routes/productRouter.js";
+import UserRouter from "./Routes/UserRouter.js";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import orderPlace from "./Routes/orderPlace.js";
+import orderDetails from "./Routes/ordersDetailsRouter.js";
 
-app.get("/api/products", (req, res) => {
-  res.send(data.products);
-});
-
-app.get("/api/products/slug/:slug", (req, res) => {
-  const product = data.products.find((x) => x.slug === req.params.slug);
-  if (product) {
-    res.send(product); // Return the found product instead of data.products
-  } else {
-    res.status(404).json({ message: "Product not found" });
-  }
-});
-
+const app = express(); // Initialize 'app' first
+dotenv.config();
 const port = 5000;
+
+app.use(cors()); // Then use cors middleware
+app.use(cookieParser());
+mongoose
+  .connect(process.env.MONGODB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Database connected");
+  })
+  .catch((error) => {
+    console.error("Error connecting to the database:", error);
+  });
+
+app.use(express.json());
+
+app.use("/api/seedRouter", seedRouter);
+app.use("/api/products", productRouter);
+app.use("/api/user", UserRouter);
+app.use("/api/user", orderPlace);
+app.use("/api/user/order", orderDetails);
 app.listen(port, () => {
-  console.log(`server is connected on the port ${port}`);
+  console.log(`Server is connected on port ${port}`);
 });
