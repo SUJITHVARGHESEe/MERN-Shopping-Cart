@@ -1,5 +1,6 @@
 # MERN AMAZONA
-
+for run this app cd mernamazona 
+npm start
 # Lessons
 
 1. introduction
